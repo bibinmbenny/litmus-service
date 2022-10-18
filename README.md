@@ -18,6 +18,7 @@ Learn more about this integration in our 2-part blog series: [part 1](https://me
 |       0.7.3      | keptnsandbox/litmus-service:0.1.1 |
 |       0.8.0-0.8.3      | keptnsandbox/litmus-service:0.2.0 |
 |       0.8.4-0.8.5      | keptnsandbox/litmus-service:0.2.1 |
+ |       0.19.0     |  keptnsandbox/litmus-service:0.2.2 |
 
 ## Prerequisites
 
@@ -31,7 +32,7 @@ The Keptn *litmus-service* requires the following prerequisites to be setup on t
 Execute the following commands to setup these dependencies for a demo setup: 
 
 ```console
-kubectl apply -f ./test-data/litmus/litmus-operator-v1.13.2.yaml
+kubectl apply -f ./test-data/litmus/litmus-operator-v2.13.0.yaml
 kubectl apply -f ./test-data/litmus/pod-delete-ChaosExperiment-CR.yaml 
 kubectl apply -f ./test-data/litmus/pod-delete-rbac.yaml 
 ```
@@ -50,7 +51,7 @@ You can choose to specify other [experiments](https://hub.litmuschaos.io/) depen
 Ensure that the correct `ChaosEngine` spec is provided in the [experiment manifest](./test-data/litmus/experiment.yaml) along with the 
 corresponding `ChaosExperiment` CR & RBAC manifests. 
 
-- This repo uses the sample [*carts*](https://github.com/keptn-sandbox/litmus-service/tree/master/test-data/carts) app as the Application-Under-Test (AUT)   to illustrate the impact of chaos. Hence, the [experiment](./test-data/litmus/experiment.yaml) is populated with the respective attributes for app filtering purposes. Ensure you have the right data placed in the `spec.appinfo` when adopting this for your environments.
+- This repo uses the sample [*helloservice*](https://github.com/keptn-sandbox/litmus-service/tree/master/test-data/helloservice) app as the Application-Under-Test (AUT)   to illustrate the impact of chaos. Hence, the [experiment](./test-data/litmus/experiment.yaml) is populated with the respective attributes for app filtering purposes. Ensure you have the right data placed in the `spec.appinfo` when adopting this for your environments.
 
 ## Installation -  Deploy in your Kubernetes cluster
 

@@ -209,5 +209,5 @@ metadata:
   creationTimestamp: null
   labels:
     name: prometheus-server-conf
-  name: prometheus-server-conf
+  name: prometheus-server
   selfLink: /api/v1/namespaces/monitoring/configmaps/prometheus-server-conf

@@ -19,6 +19,8 @@ import (
 * See https://github.com/keptn/spec/blob/0.8.0-alpha/cloudevents.md for details on the payload
 **/
 
+const EngineNotFound = "not found"
+
 // GenericLogKeptnCloudEventHandler is a generic handler for Keptn Cloud Events that logs the CloudEvent
 func GenericLogKeptnCloudEventHandler(myKeptn *keptnv2.Keptn, incomingEvent cloudevents.Event, data interface{}) error {
 	log.Printf("Handling %s Event: %s", incomingEvent.Type(), incomingEvent.Context.GetID())
@@ -108,8 +110,11 @@ func HandleTestsTriggered(myKeptn *keptnv2.Keptn, incomingEvent cloudevents.Even
 	for chaosStatus != "completed" {
 		log.Printf("Waiting for completion of chaos experiment..")
 		chaosStatus, err = CheckIfChaosIsStillRunning(chaosEngineName, projectAndNamespace)
-
 		if err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), EngineNotFound) {
+				log.Printf("chaosengine %v is deleted!", chaosEngineName)
+				break
+			}
 			logMessage := fmt.Sprintf("Error while retrieving chaos status: %s", err.Error())
 			log.Printf(logMessage)
 
@@ -129,7 +134,7 @@ func HandleTestsTriggered(myKeptn *keptnv2.Keptn, incomingEvent cloudevents.Even
 	log.Printf("Chaos experiment is completed")
 
 	// Construct the jsonpath filter to extract verdict of the chaosresult
-	jsonPathFilterForResult := fmt.Sprintf("jsonpath='{.items[?(@.metadata.labels.chaosUID==\"%s\")].status.experimentstatus.verdict}'", chaosUID)
+	jsonPathFilterForResult := fmt.Sprintf("jsonpath='{.items[?(@.metadata.labels.chaosUID==\"%s\")].status.experimentStatus.verdict}'", chaosUID)
 	log.Println("jsonPathFilterForResult: " + jsonPathFilterForResult)
 
 	// Getting ChaosResult Data
@@ -204,7 +209,6 @@ func ExecuteCommand(command string, args []string) (string, error) {
 // CheckIfChaosIsStillRunning checks if Chaos is still running in the specified namespace
 func CheckIfChaosIsStillRunning(chaosEngineName string, projectAndNamespace string) (string, error) {
 	chaosStatus, err := ExecuteCommand("kubectl", []string{"get", "chaosengine", chaosEngineName, "-o", "jsonpath='{.status.engineStatus}'", "-n", projectAndNamespace})
-
 	if err != nil {
 		return "", err
 	}
