@@ -8,8 +8,8 @@
 
 
 # prerequisite: have keptn installed with --use-case=continuous-delivery flag
-# 1. install Keptn https://keptn.sh/docs/quickstart/#helm
-# 2. install Keptn CLI - https://keptn.sh/docs/quickstart/#keptn-cli
+# 1. install Keptn - https://keptn.sh/docs/install/helm-install/
+# 2. install Keptn CLI - https://keptn.sh/docs/install/cli-install/
 # 3. annotate namespace to be managed by keptn `kubectl annotate namespace keptn keptn.sh/managed-by=keptn`
 # 4. label the namespace to be managed by keptn `kubectl label namespace keptn  keptn.sh/managed-by=keptn`
 # 5. connect the Keptn CLI to the cluster `keptn auth`
