@@ -10,7 +10,6 @@ spec:
   annotationCheck: 'false'
   engineState: 'active'
   chaosServiceAccount: pod-delete-sa
-  monitoring: true
   jobCleanUpPolicy: 'retain'
   experiments:
     - name: pod-delete

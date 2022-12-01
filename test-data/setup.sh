@@ -8,46 +8,70 @@
 
 
 # prerequisite: have keptn installed with --use-case=continuous-delivery flag
-
-# 1. install Istio https://tutorials.keptn.sh/tutorials/keptn-full-tour-prometheus-08/index.html?index=..%2F..index#2 
-# 2. install Keptn https://tutorials.keptn.sh/tutorials/keptn-full-tour-prometheus-08/index.html?index=..%2F..index#4
-# 3. configure Istio + Keptn  shttps://tutorials.keptn.sh/tutorials/keptn-full-tour-prometheus-08/index.html?index=..%2F..index#5
-# 4. connect the Keptn CLI to the cluster https://tutorials.keptn.sh/tutorials/keptn-full-tour-prometheus-08/index.html?index=..%2F..index#6 
+# 1. install Keptn - https://keptn.sh/docs/install/helm-install/
+# 2. install Keptn CLI - https://keptn.sh/docs/install/cli-install/
+# 3. annotate namespace to be managed by keptn `kubectl annotate namespace keptn keptn.sh/managed-by=keptn`
+# 4. label the namespace to be managed by keptn `kubectl label namespace keptn  keptn.sh/managed-by=keptn`
+# 5. connect the Keptn CLI to the cluster `keptn auth`
 
 
 #####################################################################
 # make sure you are executing those commands in test-data folder!!!
 #####################################################################
 
-# 5. LITMUS Demo Setup Pre-Req 
+# 6. LITMUS Demo Setup Pre-Req
 
 ## install litmus operator & chaos CRDs 
-kubectl apply -f litmus/litmus-operator-v1.13.2.yaml
+kubectl apply -f litmus/litmus-operator-v2.13.0.yaml
 
 # wait for operator to start
 sleep 10
 
+## create litmus-chaos namespace
+kubectl create namespace litmus-chaos
 ## pull the chaos experiment CR (static) 
 kubectl apply -f litmus/pod-delete-ChaosExperiment-CR.yaml 
 ## pull the chaos experiment RBAC (static) 
 kubectl apply -f litmus/pod-delete-rbac.yaml 
 
+# 7. Add Prometheus and Prometheus-SLI-Service
+kubectl create namespace monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/prometheus --namespace monitoring
 
-# 6. Add Prometheus and Prometheus-SLI-SErvice
-kubectl apply -f https://raw.githubusercontent.com/keptn-contrib/prometheus-service/release-0.4.0/deploy/service.yaml
-kubectl apply -f https://raw.githubusercontent.com/keptn-contrib/prometheus-sli-service/release-0.3.0/deploy/service.yaml
+PROMETHEUS_NS=<PROMETHEUS_NS>
+PROMETHEUS_ENDPOINT=<PROMETHEUS_ENDPOINT>
+ALERT_MANAGER_NS=<ALERT_MANAGER_NS>
+KEPTN_NAMESPACE="keptn"
+helm upgrade -n ${KEPTN_NAMESPACE} prometheus-service \
+  https://github.com/keptn-contrib/prometheus-service/releases/download/<VERSION>/prometheus-service-<VERSION>.tgz \
+  --reuse-values \
+  --set prometheus.namespace=${PROMETHEUS_NS} \
+  --set prometheus.endpoint=${PROMETHEUS_ENDPOINT} \
+  --set prometheus.namespace_am=${ALERT_MANAGER_NS}
 
+# 8. Install this service (litmus-service)
+kubectl apply -f ../deploy/service.yaml
 
-# 7. Install this service (litmus-service)
-# kubectl apply -f ../deploy/service.yaml
-
-# 8. Setup project and service in Keptn
+# 9. Setup project and service in Keptn
 
 ## CREATE PROJECT
-keptn create project litmus --shipyard=./shipyard.yaml
+GIT_USER=gitusername
+GIT_TOKEN=gittoken
+GIT_REMOTE_URL=remoteurl
+keptn create project litmus --shipyard=./shipyard.yaml --git-user=$GIT_USER --git-token=$GIT_TOKEN --git-remote-url=$GIT_REMOTE_URL
 
-## ONBOARD SERVICE
-keptn onboard service helloservice --chart=./helloservice/helm/ --project=litmus
+## Create SERVICE
+keptn create service helloservice --project=litmus
+
+## ADD HELLO SERVICE
+# To add only helm directly inside the tar file, tar command should be run inside the helloservice directory
+# otherwise it will add the complete path(i.e, /helloservice/helm) inside the tar
+cd helloservice && tar cfvz ./helm.tgz ./helm
+# return back to the test-data folder
+cd ..
+# adding helloservice helm tar file
+keptn add-resource --project=litmus --service=helloservice --all-stages --resource=./helloservice/helm.tgz --resourceUri=helm/helloservice.tgz
 
 ## ADD JMETER TESTS & CONFIG
 keptn add-resource --project=litmus --stage=chaos --service=helloservice --resource=./jmeter/load.jmx --resourceUri=jmeter/load.jmx
@@ -68,10 +92,9 @@ kubectl apply -f ./prometheus/blackbox-exporter.yaml
 kubectl apply -f ./prometheus/prometheus-server-conf-cm.yaml -n monitoring
 
 ## Restart prometheus
-kubectl delete pod -l app=prometheus-server -n monitoring
+kubectl delete pod -l component=server -n monitoring
 
-
-# 10. Deploy hello-service in version 0.1.1
+# 10. Trigger the deployment, tests, and evaluation of our demo application
 keptn trigger delivery --project=litmus --service=helloservice --image=jetzlstorfer/hello-server:v0.1.1
 
 # 11. Second deployment event: Scale hello-service (see deploy-event.json)
