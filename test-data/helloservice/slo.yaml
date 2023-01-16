@@ -7,7 +7,7 @@ comparison:
   number_of_comparison_results: 1
 filter:
 objectives:
-  - sli: "probe_success_percentage"
+  - sli: "Error_Rate"
     key_sli: false
     pass:             # pass if probes success is > 95%
       - criteria:
