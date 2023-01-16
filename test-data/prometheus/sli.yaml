@@ -4,3 +4,8 @@ indicators:
   probe_duration_ms: avg_over_time(probe_duration_seconds{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*1000
   probe_success_percentage: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
   Error_rate: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
+  API_Response_time: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
+  Total_DB_calls: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
+  Average_Wait_time: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
+  Average_Wait_time: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
+  Through_put: avg_over_time(probe_success{instance="$SERVICE.$PROJECT-$STAGE.svc.cluster.local:80",job="blackbox"}[$DURATION_SECONDS:1s])*100
