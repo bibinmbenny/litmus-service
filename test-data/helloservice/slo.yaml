@@ -16,6 +16,15 @@ objectives:
       - criteria:
           - ">=90"
     weight: 1
+  - sli: "Error_rate"
+    key_sli: false
+    pass:             # pass if probes success is > 95%
+      - criteria:
+          - ">=95"   
+    warning:          # warn if probe success is < 95 and >= 90
+      - criteria:
+          - ">=90"
+    weight: 1
   - sli: "probe_duration_ms"
     pass:             # pass if probes are faster than 200ms
       - criteria:
